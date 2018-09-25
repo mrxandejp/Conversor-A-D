@@ -1,0 +1,108 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Thu Sep 20 17:15:16 2018
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_2       code   0x000000    program   0x000002
+                   .org_3       code   0x000004    program   0x0002f0
+.config_2007_/HOME/ALEXANDRE/MPLABXPROJECTS/A       code   0x002007    program   0x000002
+                   .org_1       code   0x002100    program   0x000012
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x00017b      
+                            0x002007    0x002007      
+                            0x002100    0x002108      
+            387 out of 1158 program addresses used, program memory utilization is 33%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  AGUARDA   0x00001f    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               CALC_MEDIA   0x0000cf    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               CLEAR_DADO   0x00002a    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+              CLEAR_DADO2   0x000036    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                CLEAR_GP4   0x000047    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                CLOCK_REG   0x00004a    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                CONVERSAO   0x0000bc    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               DECOMPONDO   0x0000eb    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    DELAY   0x00003f    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                DELAY_200   0x000176    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+            DEPOIS_DO_INC   0x0000d4    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+          DEPOIS_INC_SOMA   0x0000e7    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                      FIM   0x00017b    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+         FIM_DECOMPOSICAO   0x0000f3    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+             GRAVA_EEPROM   0x000013    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                   INICIO   0x000058    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                LE_EEPROM   0x00000c    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    LOOP1   0x0000c0    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                   LOOP_1   0x000041    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                 LOOP_DIV   0x000026    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                LOOP_DIV2   0x000032    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                     MAIN   0x000066    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    MEDIA   0x0000d9    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                  NAO_100   0x000143    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                 PORCENTO   0x000165    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               REG_DESLOC   0x000044    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                     SAIR   0x00002d    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    SAIR2   0x000039    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                  SAI_INT   0x000007    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                 SET_DADO   0x00002c    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                SET_DADO2   0x000038    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                  SET_GP4   0x000049    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                     SOMA   0x0000e2    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               SUBROTINA1   0x000024    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+             TRATAR_DADOS   0x000024    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    VOLTA   0x0000c1    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  SAI_INT   0x000007    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                LE_EEPROM   0x00000c    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+             GRAVA_EEPROM   0x000013    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                  AGUARDA   0x00001f    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+             TRATAR_DADOS   0x000024    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               SUBROTINA1   0x000024    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                 LOOP_DIV   0x000026    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               CLEAR_DADO   0x00002a    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                 SET_DADO   0x00002c    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                     SAIR   0x00002d    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                LOOP_DIV2   0x000032    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+              CLEAR_DADO2   0x000036    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                SET_DADO2   0x000038    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    SAIR2   0x000039    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    DELAY   0x00003f    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                   LOOP_1   0x000041    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               REG_DESLOC   0x000044    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                CLEAR_GP4   0x000047    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                  SET_GP4   0x000049    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                CLOCK_REG   0x00004a    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                   INICIO   0x000058    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                     MAIN   0x000066    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                CONVERSAO   0x0000bc    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    LOOP1   0x0000c0    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    VOLTA   0x0000c1    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               CALC_MEDIA   0x0000cf    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+            DEPOIS_DO_INC   0x0000d4    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                    MEDIA   0x0000d9    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                     SOMA   0x0000e2    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+          DEPOIS_INC_SOMA   0x0000e7    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+               DECOMPONDO   0x0000eb    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+         FIM_DECOMPOSICAO   0x0000f3    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                  NAO_100   0x000143    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                 PORCENTO   0x000165    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                DELAY_200   0x000176    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+                      FIM   0x00017b    program     static /home/alexandre/MPLABXProjects/Atividade3-AV2.X/Alexandre-Conversor.ASM
+
+

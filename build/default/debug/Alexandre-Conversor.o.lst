@@ -1,0 +1,1052 @@
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00002 ;*              MODIFICAÇÕES PARA USO COM 12F675                   *
+                      00003 ;*                FEITAS PELO PROF. MARDSON                        *
+                      00004 ;*                    FEVEREIRO DE 2014                            *
+                      00005 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00006         
+                      00007 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00008 ;*                       NOME DO PROJETO                           *
+                      00009 ;*                           CLIENTE                               *
+                      00010 ;*         DESENVOLVIDO PELA MOSAICO ENGENHARIA E CONSULTORIA      *
+                      00011 ;*   VERSÃO: 1.0                           DATA: 17/06/03          *
+                      00012 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00013 ;*                     DESCRIÇÃO DO ARQUIVO                        *
+                      00014 ;*-----------------------------------------------------------------*
+                      00015 ;*   MODELO PARA O PIC 12F675                                      *
+                      00016 ;*                                                                 *
+                      00017 ;*                                                                 *
+                      00018 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00019 
+                      00020 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00021 ;*                     ARQUIVOS DE DEFINIÇÕES                      *
+                      00022 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00023 #INCLUDE <p12f675.inc>  ;ARQUIVO PADRÃO MICROCHIP PARA 12F675
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Nov 22 2017
+                      00005 ;  MPASM PIC12F675 processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00367         LIST
+                      00024 
+2007   3FA4           00025         __CONFIG _BODEN_OFF & _CP_OFF & _PWRTE_ON & _WDT_OFF & _MCLRE_ON & _INTRC_OSC_NOCLKOUT
+                      00026 
+                      00027 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00028 ;*                    PAGINAÇÃO DE MEMÓRIA                         *
+                      00029 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00030 ;DEFINIÇÃO DE COMANDOS DE USUÁRIO PARA ALTERAÇÃO DA PÁGINA DE MEMÓRIA
+                      00031 #DEFINE BANK0   BCF STATUS,RP0  ;SETA BANK 0 DE MEMÓRIA
+                      00032 #DEFINE BANK1   BSF STATUS,RP0  ;SETA BANK 1 DE MAMÓRIA
+                      00033 
+                      00034 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00035 ;*                         VARIÁVEIS                               *
+                      00036 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00037 ; DEFINIÇÃO DOS NOMES E ENDEREÇOS DE TODAS AS VARIÁVEIS UTILIZADAS 
+                      00038 ; PELO SISTEMA
+                      00039 
+                      00040         CBLOCK  0x20    ;ENDEREÇO INICIAL DA MEMÓRIA DE
+                      00041                                         ;USUÁRIO
+  00000020            00042                 W_TEMP          ;REGISTRADORES TEMPORÁRIOS PARA USO
+  00000021            00043                 STATUS_TEMP     ;JUNTO ÀS INTERRUPÇÕES
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+  00000022            00044                 INICIA          ;VARIÁVEL PARA INICIAR O LCD
+                      00045         
+  00000023            00046                 DADO            ;ARMAZENA O DADO PARA A EEPROM
+  00000024            00047                 DADO1
+  00000025            00048                 DADO2
+  00000026            00049                 CONT
+  00000027            00050                 CONT2
+  00000028            00051                 CONT3
+  00000029            00052                 CONT_AUX
+  0000002A            00053                 AUX
+  0000002B            00054                 DELAY_TEMP
+  0000002C            00055                 MEDIA1
+  0000002D            00056                 MEDIA2
+  0000002E            00057                 MEDIA_AUX
+                      00058                 
+                      00059                 ;NOVAS VARIÁVEIS
+                      00060 
+                      00061         ENDC                    ;FIM DO BLOCO DE MEMÓRIA
+                      00062 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00063 ;*                        FLAGS INTERNOS                           *
+                      00064 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00065 ; DEFINIÇÃO DE TODOS OS FLAGS UTILIZADOS PELO SISTEMA
+                      00066 
+                      00067 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00068 ;*                         CONSTANTES                              *
+                      00069 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00070 ; DEFINIÇÃO DE TODAS AS CONSTANTES UTILIZADAS PELO SISTEMA
+                      00071 ; INICIALIZAÇÃO DA EEPROM, DE ACORDO COM A DESCRIÇÃO NO ARQUIVO "Def_Rega_Formigas.inc"
+                      00072 
+                      00073 ;A PARTIR DO ENDEREÇO ZERO DA EEPROM, DADOS EM ORDEM ALEATÓRIA
+2100                  00074         ORG 0x2100
+                      00075                 ;A   l    e    x    a    n    d    r    e
+2100   0041 006C 0065 00076         DE      0X41,0X6C,0X65,0X78,0X61,0X6E,0X64,0X72,0X65
+       0078 0061 006E 
+       0064 0072 0065 
+                      00077 
+                      00078 
+                      00079 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00080 ;*                           ENTRADAS                              *
+                      00081 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00082 ; DEFINIÇÃO DE TODOS OS PINOS QUE SERÃO UTILIZADOS COMO ENTRADA
+                      00083 ; RECOMENDAMOS TAMBÉM COMENTAR O SIGNIFICADO DE SEUS ESTADOS (0 E 1)
+                      00084 
+                      00085 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00086 ;*                           SAÍDAS                                *
+                      00087 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00088 ; DEFINIÇÃO DE TODOS OS PINOS QUE SERÃO UTILIZADOS COMO SAÍDA
+                      00089 ; RECOMENDAMOS TAMBÉM COMENTAR O SIGNIFICADO DE SEUS ESTADOS (0 E 1)
+                      00090 
+                      00091 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00092 ;*                       VETOR DE RESET                            *
+                      00093 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00094 
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0000                  00095         ORG     0x00                    ;ENDEREÇO INICIAL DE PROCESSAMENTO
+0000   2858           00096         GOTO    INICIO
+                      00097         
+                      00098 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00099 ;*                    INÍCIO DA INTERRUPÇÃO                        *
+                      00100 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00101 ; ENDEREÇO DE DESVIO DAS INTERRUPÇÕES. A PRIMEIRA TAREFA É SALVAR OS
+                      00102 ; VALORES DE "W" E "STATUS" PARA RECUPERAÇÃO FUTURA
+                      00103 
+0004                  00104         ORG     0x04                    ;ENDEREÇO INICIAL DA INTERRUPÇÃO
+0004   00A0           00105         MOVWF   W_TEMP          ;COPIA W PARA W_TEMP
+0005   0E03           00106         SWAPF   STATUS,W
+0006   00A1           00107         MOVWF   STATUS_TEMP     ;COPIA STATUS PARA STATUS_TEMP
+                      00108 
+                      00109 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00110 ;*                    ROTINA DE INTERRUPÇÃO                        *
+                      00111 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00112 ; AQUI SERÁ ESCRITA AS ROTINAS DE RECONHECIMENTO E TRATAMENTO DAS
+                      00113 ; INTERRUPÇÕES
+                      00114 
+                      00115 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00116 ;*                 ROTINA DE SAÍDA DA INTERRUPÇÃO                  *
+                      00117 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00118 ; OS VALORES DE "W" E "STATUS" DEVEM SER RECUPERADOS ANTES DE 
+                      00119 ; RETORNAR DA INTERRUPÇÃO
+                      00120 
+0007                  00121 SAI_INT
+0007   0E21           00122         SWAPF   STATUS_TEMP,W
+0008   0083           00123         MOVWF   STATUS          ;MOVE STATUS_TEMP PARA STATUS
+0009   0EA0           00124         SWAPF   W_TEMP,F
+000A   0E20           00125         SWAPF   W_TEMP,W        ;MOVE W_TEMP PARA W
+000B   0009           00126         RETFIE
+                      00127 
+                      00128 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00129 ;*                       ROTINAS E SUBROTINAS                      *
+                      00130 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00131 ; CADA ROTINA OU SUBROTINA DEVE POSSUIR A DESCRIÇÃO DE FUNCIONAMENTO
+                      00132 ; E UM NOME COERENTE ÀS SUAS FUNÇÕES.
+000C                  00133 LE_EEPROM
+                      00134 ;LER DADO DA EEPROM, CUJO ENDEREÇO É INDICADO EM W
+                      00135 ;DADO LIDO RETORNA EM W
+000C   397F           00136         ANDLW   .127            ;LIMITA ENDEREÇO MAX. 127
+000D   1683           00137         BANK1                           ;ACESSO VIA BANK 1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000E   009B           00138         MOVWF   EEADR           ;INDICA O END. DE LEITURA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+000F   141C           00139         BSF             EECON1,RD       ;INICIA O PROCESSO DE LEITURA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0010   081A           00140         MOVF    EEDATA,W        ;COLOCA DADO LIDO EM W
+0011   1283           00141         BANK0                           ;POSICIONA PARA BANK 0
+0012   0008           00142         RETURN
+                      00143 
+0013                  00144 GRAVA_EEPROM
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00145 ;ESCREVE DADO (DADO) NA EEPROM, CUJO ENDEREÇO É INDICADO EM W
+0013   397F           00146         ANDLW   .127            ;LIMITA ENDEREÇO MAX. 127
+0014   1683           00147         BANK1                           ;ACESSO VIA BANK 1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0015   009B           00148         MOVWF   EEADR
+0016   0823           00149         MOVF    DADO,W
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0017   009A           00150         MOVWF   EEDATA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0018   151C           00151         BSF             EECON1,WREN ;HABILITA ESCRITA
+0019   138B           00152         BCF             INTCON,GIE      ;DESLIGA INTERRUPÇÕES
+001A   3055           00153         MOVLW   B'01010101'     ;DESBLOQUEIA ESCRITA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001B   009D           00154         MOVWF   EECON2          ;
+001C   30AA           00155         MOVLW   B'10101010'     ;DESBLOQUEIA ESCRITA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001D   009D           00156         MOVWF   EECON2          ;
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001E   149C           00157         BSF             EECON1,WR ;INICIA A ESCRITA
+001F                  00158 AGUARDA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+001F   189C           00159         BTFSC   EECON1,WR ;TERMINOU?
+0020   281F           00160         GOTO    AGUARDA
+0021   178B           00161         BSF             INTCON,GIE ;HABILITA INTERRUPÇÕES
+0022   1283           00162         BANK0                           ;POSICIONA PARA BANK 0
+0023   0008           00163         RETURN
+                      00164 
+0024                  00165 SUBROTINA1
+                      00166         ;CORPO DA ROTINA
+                      00167 ;SUBROTINA PARA TRATAR MEUS DADOS
+0024                  00168 TRATAR_DADOS
+0024   3004           00169         MOVLW   .4 ;COMO IREI DIVIDIR O MEU BYTE UTILIZANDO 4 BITS PARA CADA VARIÁVEL
+0025   00A7           00170         MOVWF   CONT2   ;INICIALMENTE PEGAREMOS OS 4 BITS MAIS SIGNIFICATIVOS
+0026                  00171 LOOP_DIV        
+Message[305]: Using default destination of 1 (file).
+0026   0CA4           00172         RRF     DADO1
+0027   1FA3           00173         BTFSS   DADO,7
+0028   282A           00174         GOTO    CLEAR_DADO
+0029   282C           00175         GOTO    SET_DADO
+002A                  00176 CLEAR_DADO
+002A   11A4           00177         BCF     DADO1,3
+002B   282D           00178         GOTO    SAIR
+002C                  00179 SET_DADO
+002C   15A4           00180         BSF     DADO1,3
+002D                  00181 SAIR    
+Message[305]: Using default destination of 1 (file).
+002D   0DA3           00182         RLF     DADO
+Message[305]: Using default destination of 1 (file).
+002E   0BA7           00183         DECFSZ  CONT2
+002F   2826           00184         GOTO    LOOP_DIV
+                      00185         ;PREENCHER DADO2
+0030   3004           00186         MOVLW   .4  ;COMO IREI DIVIDIR O MEU BYTE UTILIZANDO 4 BITS PARA CADA VARIÁVEL
+0031   00A7           00187         MOVWF   CONT2   ;POR ÚLTIMO PEGAREMOS 4 BITS MENOS SIGNIFICATIVOS
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0032                  00188 LOOP_DIV2       
+Message[305]: Using default destination of 1 (file).
+0032   0CA5           00189         RRF     DADO2
+0033   1FA3           00190         BTFSS   DADO,7
+0034   2836           00191         GOTO    CLEAR_DADO2
+0035   2838           00192         GOTO    SET_DADO2
+0036                  00193 CLEAR_DADO2
+0036   11A5           00194         BCF     DADO2,3
+0037   2839           00195         GOTO    SAIR2
+0038                  00196 SET_DADO2
+0038   15A5           00197         BSF     DADO2,3
+0039                  00198 SAIR2   
+Message[305]: Using default destination of 1 (file).
+0039   0DA3           00199         RLF     DADO
+Message[305]: Using default destination of 1 (file).
+003A   0BA7           00200         DECFSZ  CONT2
+003B   2832           00201         GOTO    LOOP_DIV2
+                      00202         
+003C   1624           00203         BSF     DADO1,4  ;SETANDO PARA O LCD IDENTIFICAR QUE É UMA ESCRITA DE DADOS
+003D   1625           00204         BSF     DADO2,4  ;SETANDO PARA O LCD IDENTIFICAR QUE É UMA ESCRITA DE DADOS
+003E   0008           00205         RETURN
+                      00206         
+                      00207         
+003F                  00208 DELAY
+                      00209         ;FUNÇÃO PARA FAZER DELAY COM QUALQUER TEMPO
+003F   0081           00210         MOVWF   TMR0
+0040   110B           00211         BCF     INTCON, T0IF
+0041                  00212 LOOP_1
+0041   1D0B           00213         BTFSS   INTCON, T0IF
+0042   2841           00214         GOTO    LOOP_1
+0043   0008           00215         RETURN
+                      00216         
+                      00217 ;SUBROTINA PARA COLOCAR MEUS DADOS NO REGISTRADOR DE DESLOCAMENTO
+0044                  00218 REG_DESLOC
+0044   1C22           00219         BTFSS   INICIA,0
+0045   2847           00220         GOTO    CLEAR_GP4
+0046   2849           00221         GOTO    SET_GP4
+0047                  00222 CLEAR_GP4
+0047   1205           00223         BCF     GPIO,GP4
+0048   284A           00224         GOTO    CLOCK_REG
+0049                  00225 SET_GP4
+0049   1605           00226         BSF     GPIO,GP4
+004A                  00227 CLOCK_REG ;CLOCK PARA DESLOCAR O DADO NO REGISTRADOR
+004A   1405           00228         BSF     GPIO,GP0
+004B   1005           00229         BCF     GPIO,GP0
+Message[305]: Using default destination of 1 (file).
+004C   0CA2           00230         RRF     INICIA
+004D   0BA6           00231         DECFSZ  CONT,F
+004E   2844           00232         GOTO    REG_DESLOC
+                      00233         ;QUATRO PULSOS DE CLOCK PARA AJUSTAR MEU DADO NO REGISTRADOR
+004F   1405           00234         BSF     GPIO,GP0
+0050   1005           00235         BCF     GPIO,GP0
+0051   1405           00236         BSF     GPIO,GP0
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0052   1005           00237         BCF     GPIO,GP0
+0053   1405           00238         BSF     GPIO,GP0
+0054   1005           00239         BCF     GPIO,GP0
+0055   1685           00240         BSF     GPIO,GP5
+0056   1285           00241         BCF     GPIO,GP5
+0057   0008           00242         RETURN
+                      00243 
+                      00244 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00245 ;*                     INICIO DO PROGRAMA                          *
+                      00246 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00247         
+0058                  00248 INICIO
+0058   1683           00249         BANK1                           ;ALTERA PARA O BANCO 1
+0059   3004           00250         MOVLW   B'00000100' ;CONFIGURA TODAS AS PORTAS DO GPIO (PINOS)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+005A   0085           00251         MOVWF   TRISIO          ;COMO SAÍDAS
+005B   3014           00252         MOVLW   B'00010100'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+005C   009F           00253         MOVWF   ANSEL           ;DEFINE PORTAS COMO Digital I/O
+005D   3005           00254         MOVLW   B'00000101'     ;DEFININDO PRESCALE 1:64
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+005E   0081           00255         MOVWF   OPTION_REG      ;DEFINE OPÇÕES DE OPERAÇÃO
+005F   3000           00256         MOVLW   B'00000000'
+0060   008B           00257         MOVWF   INTCON          ;DEFINE OPÇÕES DE INTERRUPÇÕES
+0061   1283           00258         BANK0                           ;RETORNA PARA O BANCO
+0062   3007           00259         MOVLW   B'00000111'
+0063   0099           00260         MOVWF   CMCON           ;DEFINE O MODO DE OPERAÇÃO DO COMPARADOR ANALÓGICO
+0064   3009           00261         MOVLW   B'00001001'
+0065   009F           00262         MOVWF   ADCON0
+                      00263 
+                      00264 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00265 ;*                     INICIALIZAÇÃO DAS VARIÁVEIS                 *
+                      00266 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00267 
+                      00268 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00269 ;*                     ROTINA PRINCIPAL                            *
+                      00270 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+0066                  00271 MAIN
+                      00272         ;CORPO DA ROTINA PRINCIPAL
+                      00273         ;CONFIGURANDO O LCD. FAZENDO SUA INICIALIZAÇÃO
+0066   3006           00274         MOVLW   .6
+0067   203F           00275         CALL    DELAY
+0068   300C           00276         MOVLW   B'00001100'
+0069   00A2           00277         MOVWF   INICIA
+006A   3005           00278         MOVLW   .5
+006B   00A6           00279         MOVWF   CONT
+006C   2044           00280         CALL    REG_DESLOC
+                      00281         ;ESPERAR CERCA DE 5ms
+006D   30B0           00282         MOVLW   .176
+006E   203F           00283         CALL    DELAY
+006F   300C           00284         MOVLW   B'00001100'
+0070   00A2           00285         MOVWF   INICIA
+0071   3005           00286         MOVLW   .5
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0072   00A6           00287         MOVWF   CONT
+0073   2044           00288         CALL    REG_DESLOC
+                      00289         ;ESPERAR CERCA DE 128us
+0074   30FE           00290         MOVLW   .254
+0075   203F           00291         CALL    DELAY
+0076   300C           00292         MOVLW   B'00001100'
+0077   00A2           00293         MOVWF   INICIA
+0078   3005           00294         MOVLW   .5
+0079   00A6           00295         MOVWF   CONT
+007A   2044           00296         CALL    REG_DESLOC
+                      00297         ;Function set ( Set interface to be 4 bits long. ) Interface is 8 bits in length.
+                      00298         ;ESPERAR CERCA DE 128us
+007B   30FE           00299         MOVLW   .254
+007C   203F           00300         CALL    DELAY
+007D   3004           00301         MOVLW   B'00000100'
+007E   00A2           00302         MOVWF   INICIA
+007F   3005           00303         MOVLW   .5
+0080   00A6           00304         MOVWF   CONT
+0081   2044           00305         CALL    REG_DESLOC
+                      00306         ;Function set ( Interface is 4 bits long. Specify the number of display lines and character font
+                            . )
+                      00307         ;The number of display lines and character font can not be changed after this point.
+                      00308         ;ESPERAR CERCA DE 128us
+0082   30FE           00309         MOVLW   .254
+0083   203F           00310         CALL    DELAY
+0084   3004           00311         MOVLW   B'00000100'
+0085   00A2           00312         MOVWF   INICIA
+0086   3005           00313         MOVLW   .5
+0087   00A6           00314         MOVWF   CONT
+0088   2044           00315         CALL    REG_DESLOC
+                      00316         ;PARTE 2 DO SYSTEM SET
+                      00317         ;ESPERAR CERCA DE 128us
+0089   30FE           00318         MOVLW   .254
+008A   203F           00319         CALL    DELAY
+008B   3003           00320         MOVLW   B'00000011'
+008C   00A2           00321         MOVWF   INICIA
+008D   3005           00322         MOVLW   .5
+008E   00A6           00323         MOVWF   CONT
+008F   2044           00324         CALL    REG_DESLOC
+                      00325         ;Display ON
+                      00326         ;ESPERAR CERCA DE 128us
+0090   30FE           00327         MOVLW   .254
+0091   203F           00328         CALL    DELAY
+0092   3000           00329         MOVLW   B'00000000'
+0093   00A2           00330         MOVWF   INICIA
+0094   3005           00331         MOVLW   .5
+0095   00A6           00332         MOVWF   CONT
+0096   2044           00333         CALL    REG_DESLOC
+                      00334         ;PARTE 2 DISPLAY ON
+                      00335         ;ESPERAR CERCA DE 128us
+0097   30FE           00336         MOVLW   .254
+0098   203F           00337         CALL    DELAY
+0099   3003           00338         MOVLW   B'00000011'
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+009A   00A2           00339         MOVWF   INICIA
+009B   3005           00340         MOVLW   .5
+009C   00A6           00341         MOVWF   CONT
+009D   2044           00342         CALL    REG_DESLOC
+                      00343         ;Display clear
+                      00344         ;ESPERAR CERCA DE 128us
+009E   30FE           00345         MOVLW   .254
+009F   203F           00346         CALL    DELAY
+00A0   3000           00347         MOVLW   B'00000000'
+00A1   00A2           00348         MOVWF   INICIA
+00A2   3005           00349         MOVLW   .5
+00A3   00A6           00350         MOVWF   CONT
+00A4   2044           00351         CALL    REG_DESLOC
+                      00352         ;PARTE 2 Display clear
+                      00353         ;ESPERAR CERCA DE 128us
+00A5   30FE           00354         MOVLW   .254
+00A6   203F           00355         CALL    DELAY
+00A7   3008           00356         MOVLW   B'00001000'
+00A8   00A2           00357         MOVWF   INICIA
+00A9   3005           00358         MOVLW   .5
+00AA   00A6           00359         MOVWF   CONT
+00AB   2044           00360         CALL    REG_DESLOC
+                      00361         ;Entry mode set
+                      00362         ;ESPERAR CERCA DE 128us
+00AC   30FE           00363         MOVLW   .254
+00AD   203F           00364         CALL    DELAY
+00AE   3000           00365         MOVLW   B'00000000'
+00AF   00A2           00366         MOVWF   INICIA
+00B0   3005           00367         MOVLW   .5
+00B1   00A6           00368         MOVWF   CONT
+00B2   2044           00369         CALL    REG_DESLOC
+                      00370         ;PARTE 2 Entry mode set
+                      00371         ;ESPERAR CERCA DE 128us
+00B3   30FE           00372         MOVLW   .254
+00B4   203F           00373         CALL    DELAY
+00B5   3004           00374         MOVLW   B'00000100'
+00B6   00A2           00375         MOVWF   INICIA
+00B7   3005           00376         MOVLW   .5
+00B8   00A6           00377         MOVWF   CONT
+00B9   2044           00378         CALL    REG_DESLOC
+                      00379         ;ESCREVER OS DADOS!
+00BA   30C8           00380         MOVLW   .200
+00BB   203F           00381         CALL    DELAY
+                      00382         
+                      00383 ;COMEÇO DA CONVERSÃO    
+00BC                  00384 CONVERSAO       
+00BC   3020           00385         MOVLW   .32     ;VAIAVEL CONT RECEBE 32, PORQUE SÃO 32 VALORES QUE É
+00BD   00A6           00386         MOVWF   CONT    ;PRECISO PEGAR PARA FAZER A MÉDIA
+00BE   3030           00387         MOVLW   0X30    ;APONTANDO PARA O ENDEREÇO 0X30 DA MEMÓRIA
+00BF   0084           00388         MOVWF   FSR
+00C0                  00389 LOOP1
+00C0   149F           00390         BSF     ADCON0, 1   ;ACIONO A CONVERSÃO
+00C1                  00391 VOLTA   
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C1   1F0C           00392         BTFSS   PIR1, ADIF  ;CONFIRO SE A FLAG DA CONVERSÃO FOI ACIONADA
+00C2   28C1           00393         GOTO    VOLTA       ;SE NÃO, CONTINUA ESPERANDO A CONVERSÃO
+00C3   081E           00394         MOVFW   ADRESH      ;O VALOR DA CONVERSÃO FICOU SALVA NESSE REGISTRADOR
+00C4   0080           00395         MOVWF   INDF        ;E COLOCO O VALOR DA CONVERSÃO NO CAMPO APONTADO NA MEMÓRA
+Message[305]: Using default destination of 1 (file).
+00C5   0A84           00396         INCF    FSR         ;INCREMENTO PARA O PRÓXIMO ENDEREÇO DA MEMÓRIA
+00C6   130C           00397         BCF     PIR1, ADIF  ;LIMPO A FLAG DO CONVERSOR
+00C7   0BA6           00398         DECFSZ  CONT,F      ;DECREMENTO O CONT E CONFIRO JA FOI OS 32 VALORES
+00C8   28C0           00399         GOTO    LOOP1       ;SE NÃO FOI, VOLTA PARA PEGAR O RESTO DOS VALORES
+                      00400         
+00C9   01AC           00401         CLRF    MEDIA1      ;LIMPO OS VALORES ANTERIORES DAS VARIAVEIS MEDIA1 E 2
+00CA   01AD           00402         CLRF    MEDIA2      ;POIS IREI UTILIZAR PARA AS PROXIMAS MÉDIAS
+00CB   3020           00403         MOVLW   .32         ;NOVAMENTE COLOCO O CONT PARA 32, PARA PEGAR OS 32
+00CC   00A6           00404         MOVWF   CONT        ;VALORES NA MEMÓRIA
+00CD   3030           00405         MOVLW   0X30        ;APONTO NOVAMENTE O PONTEIRO PARA A POSIÇÃO 0X30 DA MEMÓRIA
+00CE   0084           00406         MOVWF   FSR
+00CF                  00407 CALC_MEDIA
+00CF   0800           00408         MOVFW   INDF        ;MOVO O VALOR DA MEMÓRIA PARA O WORK, PARA PODER SOMAR
+00D0   07AC           00409         ADDWF   MEDIA1,F    ;COM A VARIÁVEL MEDIA1
+00D1   1C03           00410         BTFSS   STATUS,C    ;SE O BYTE ESTOURAR EU INCREMENTO 1 NA PROXIMA VARIÁVEL
+00D2   28D4           00411         GOTO    DEPOIS_DO_INC   ;PULAR O INCREMENTO
+00D3   0AAD           00412         INCF    MEDIA2,F    ;COMO ESTOUROU O BYTE DA MEDIA1, INCREMENTEI 1 NO MEDIA2
+00D4                  00413 DEPOIS_DO_INC
+Message[305]: Using default destination of 1 (file).
+00D4   0A84           00414         INCF    FSR         ;AGORA INCREMENTO O VALOR DO PONTEIRO PARA PEGAR O PROX ENDEREÇO DA MEMÓRIA
+00D5   0BA6           00415         DECFSZ  CONT,F      ;CONFIRO SE JA FOI FEITO A SOMA DOS 32 VALORES
+00D6   28CF           00416         GOTO    CALC_MEDIA  ;SE NÃO SOMOU TODOS OS VALORES, VOLTO PARA CONTINUAR A SOMA
+00D7   3005           00417         MOVLW   .5          ;SE JA FOI FEITO A SOMA, VAMOS FAZER A MÉDIA
+00D8   00A6           00418         MOVWF   CONT        ;COMO SÃO 32 VALORES, SÓ É PRECISO ROTACIONAR PARA A DIREITA 5 VEZES
+00D9                  00419 MEDIA   
+Message[305]: Using default destination of 1 (file).
+00D9   0CAD           00420         RRF     MEDIA2      ;ROTACIONO PRIMEIRO A VARIAVEL MEDIA2 QUE TEM VALORES MAIS SIGNIFICATIVOS
+Message[305]: Using default destination of 1 (file).
+00DA   0CAC           00421         RRF     MEDIA1      ;E OS VALORES VAI PARA O CARRY, E ROTACIONO O MEDIA1 QUE PEGA O VALOR DO CAR
+                            RY
+00DB   0BA6           00422         DECFSZ  CONT,F      ;CONFIRO SE FOI ROTACIONADO 5 VEZES
+00DC   28D9           00423         GOTO    MEDIA       ;SE NÃO, CONTINUO ROTACIONANDO 
+                      00424         
+                      00425         ;AGORA SERÁ FEITO OS CÁLCULOS PARA SABER A PORCENTAGEM
+00DD   3064           00426         MOVLW   .100        ;COLOCO 100 NO CONT, POIS SERÁ NECESSÁRIO MULTIPLICAR POR 100
+00DE   00A6           00427         MOVWF   CONT        ;NO CASO SERÁ FEITO SOMAS CONSECUTIVAS 100 VEZES
+00DF   01AD           00428         CLRF    MEDIA2      ;LIMPO MEDIA2 PARA PODER UTILIZA-LO
+00E0   082C           00429         MOVFW   MEDIA1      ;MOVO O VALOR DE MEDIA1 PARA MEDIA_AUX PARA PODER SALVAR O VALOR
+00E1   00AE           00430         MOVWF   MEDIA_AUX   ;ANTES DE FAZER ALTERAÇÕES
+00E2                  00431 SOMA
+00E2   082E           00432         MOVFW   MEDIA_AUX   ;AGORA UTILIZO O PRIMEIRO VALOR DO MEDIA1, E FAÇO SOMAS 
+Message[305]: Using default destination of 1 (file).
+00E3   07AC           00433         ADDWF   MEDIA1      ;CONSECUTIVAS, QUE É EQUIVALENTE DE MULTIPLICAR POR 100
+00E4   1C03           00434         BTFSS   STATUS,C    ;TESTO SE O VALOR DO BYTE ESTOUROU, SE ESTOUROU EU INCREMENTO O MEDIA2
+00E5   28E7           00435         GOTO    DEPOIS_INC_SOMA ;SE NÃO ESTOROU EU PULO O INCREMENTO
+00E6   0AAD           00436         INCF    MEDIA2,F    ;INCREMENTA O MEDIA2
+00E7                  00437 DEPOIS_INC_SOMA
+00E7   0BA6           00438         DECFSZ  CONT,F      ;DECREMENTO A VARIAVEL CONT PARA SABER SE JA TERMINOU A MULTIPLICAÇÃO
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00E8   28E2           00439         GOTO    SOMA        ;SE NÃO TERMINOU, CONTINUA FAZENDO AS SOMAS CONSECUTIVAS
+                      00440         
+                      00441         ;COMO É PRECISO DIVIDIR POR 256, SERIA A MESMA COISA DE ROTACIONAR MEDIA2 E MEDIA1 8 VEZES
+                      00442         ;LOGO A PORCENTAGEM DA MEDIA É O PRÓPRIO VALOR DE MEDIA2
+                      00443         ;AGORA É NECESSÁRIO SEPARAR A UNIDADE DA DEZENA
+00E9   3000           00444         MOVLW   .0          ;COLOCO O CONT_AUX EM 0
+00EA   00A9           00445         MOVWF   CONT_AUX
+00EB                  00446 DECOMPONDO      
+00EB   082D           00447         MOVFW   MEDIA2      ;E MOVO O VALOR DE MEDIA2 PARA MEDIA1
+00EC   00AC           00448         MOVWF   MEDIA1
+00ED   300A           00449         MOVLW   .10         ;E SUBTRAIO 10 DE MEDIA2
+00EE   02AD           00450         SUBWF   MEDIA2,F
+00EF   1C03           00451         BTFSS   STATUS,C    ;SE FOR POSITIVO CONTINUA SUBTRAINDO POR 10
+00F0   28F3           00452         GOTO    FIM_DECOMPOSICAO    ;SE DER NEGATIVO É PORQUE SÓ SOBROU A UNIDADE
+Message[305]: Using default destination of 1 (file).
+00F1   0AA9           00453         INCF    CONT_AUX    ;INCREMENTO O DO CONT_AUX, PORQUE ELE QUE SERÁ NOSSA DEZENA
+00F2   28EB           00454         GOTO    DECOMPONDO  ;E CONTINUO SUBTRAINDO POR 10
+00F3                  00455 FIM_DECOMPOSICAO
+                      00456         ;CLEAR LCD
+                      00457         ;ESPERAR CERCA DE 128us
+00F3   30FE           00458         MOVLW   .254
+00F4   203F           00459         CALL    DELAY
+00F5   3000           00460         MOVLW   B'00000000'
+00F6   00A2           00461         MOVWF   INICIA
+00F7   3005           00462         MOVLW   .5
+00F8   00A6           00463         MOVWF   CONT
+00F9   2044           00464         CALL    REG_DESLOC
+                      00465         ;PARTE 2 Display clear
+                      00466         ;ESPERAR CERCA DE 128us
+00FA   30FE           00467         MOVLW   .254
+00FB   203F           00468         CALL    DELAY
+00FC   3008           00469         MOVLW   B'00001000'
+00FD   00A2           00470         MOVWF   INICIA
+00FE   3005           00471         MOVLW   .5
+00FF   00A6           00472         MOVWF   CONT
+0100   2044           00473         CALL    REG_DESLOC
+                      00474         
+                      00475         ;Entry mode set
+                      00476         ;ESPERAR CERCA DE 128us
+0101   30FE           00477         MOVLW   .254
+0102   203F           00478         CALL    DELAY
+0103   3000           00479         MOVLW   B'00000000'
+0104   00A2           00480         MOVWF   INICIA
+0105   3005           00481         MOVLW   .5
+0106   00A6           00482         MOVWF   CONT
+0107   2044           00483         CALL    REG_DESLOC
+                      00484         ;PARTE 2 Entry mode set
+                      00485         ;ESPERAR CERCA DE 128us
+0108   30FE           00486         MOVLW   .254
+0109   203F           00487         CALL    DELAY
+010A   3004           00488         MOVLW   B'00000100'
+010B   00A2           00489         MOVWF   INICIA
+010C   3005           00490         MOVLW   .5
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+010D   00A6           00491         MOVWF   CONT
+010E   2044           00492         CALL    REG_DESLOC
+                      00493         ;ESCREVER OS DADOS!
+010F   30C8           00494         MOVLW   .200
+0110   203F           00495         CALL    DELAY
+                      00496         
+0111   300A           00497         MOVLW   .10         ;SUBTRAIO O CONT_AUX POR 10 E SALVO NO WORK PARA SABER
+0112   0229           00498         SUBWF   CONT_AUX,W  ;SE DEU 100% OU NÃO
+0113   1D03           00499         BTFSS   STATUS, Z   ;CONFIRO SE DEU 100%
+0114   2943           00500         GOTO    NAO_100     ;QUANDO NÃO FOR 100%
+                      00501         
+0115   3031           00502         MOVLW   .49         ;SE DEU 100%
+0116   00A3           00503         MOVWF   DADO        ;MOVO O VALOR 1 NA TABELA ASCII EM DADO
+0117   2024           00504         CALL    TRATAR_DADOS    ;TRATO OS DADOS PARA COLOCAR NO LCD
+0118   0824           00505         MOVFW   DADO1       ;MOVO O VALOR DE DADO1 PARA A VARIVEL INICIA QUE 
+0119   00A2           00506         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+011A   3005           00507         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+011B   00A6           00508         MOVWF   CONT    
+011C   2044           00509         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+011D   30FE           00510         MOVLW   .254        ;DOU UM DELAY PARA PODER ESCREVER
+011E   203F           00511         CALL    DELAY
+                      00512         ;DEPOIS ENVIO A SEGUNDA PARTE DA LETRA PARA O LCD
+011F   0825           00513         MOVFW   DADO2       ;MOVO O VALOR DE DADO2 PARA A VARIVEL INICIA QUE
+0120   00A2           00514         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+0121   3005           00515         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+0122   00A6           00516         MOVWF   CONT
+0123   2044           00517         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+                      00518         
+0124   3030           00519         MOVLW   .48         
+0125   00A3           00520         MOVWF   DADO        ;MOVO O VALOR 0 NA TABELA ASCII EM DADO
+0126   2024           00521         CALL    TRATAR_DADOS    ;TRATO OS DADOS PARA COLOCAR NO LCD     
+0127   0824           00522         MOVFW   DADO1       ;MOVO O VALOR DE DADO1 PARA A VARIVEL INICIA QUE
+0128   00A2           00523         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+0129   3005           00524         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+012A   00A6           00525         MOVWF   CONT
+012B   2044           00526         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+012C   30FE           00527         MOVLW   .254        ;DOU UM DELAY PARA PODER ESCREVER
+012D   203F           00528         CALL    DELAY
+                      00529         ;DEPOIS ENVIO A SEGUNDA PARTE DA LETRA PARA O LCD
+012E   0825           00530         MOVFW   DADO2       ;MOVO O VALOR DE DADO2 PARA A VARIVEL INICIA QUE
+012F   00A2           00531         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+0130   3005           00532         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+0131   00A6           00533         MOVWF   CONT
+0132   2044           00534         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+                      00535         
+0133   3030           00536         MOVLW   .48         
+0134   00A3           00537         MOVWF   DADO        ;MOVO O VALOR 0 NA TABELA ASCII EM DADO
+0135   2024           00538         CALL    TRATAR_DADOS    ;TRATO OS DADOS PARA COLOCAR NO LCD     
+0136   0824           00539         MOVFW   DADO1       ;MOVO O VALOR DE DADO1 PARA A VARIVEL INICIA QUE
+0137   00A2           00540         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+0138   3005           00541         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+0139   00A6           00542         MOVWF   CONT
+013A   2044           00543         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+013B   30FE           00544         MOVLW   .254        ;DOU UM DELAY PARA PODER ESCREVER
+013C   203F           00545         CALL    DELAY
+                      00546         ;DEPOIS ENVIO A SEGUNDA PARTE DA LETRA PARA O LCD
+013D   0825           00547         MOVFW   DADO2       ;MOVO O VALOR DE DADO2 PARA A VARIVEL INICIA QUE
+013E   00A2           00548         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+013F   3005           00549         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+0140   00A6           00550         MOVWF   CONT
+0141   2044           00551         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+                      00552         
+0142   2965           00553         GOTO    PORCENTO    ;VOU PARA PRINTAR O SINAL %
+                      00554         ;SE NÃO  FOR 100%, VAMOS PRINTAR O VALOR EQUIVALENTE DA CASA DA DEZENA E UNIDADE
+0143                  00555 NAO_100 
+0143   3030           00556         MOVLW   .48         ;SOMO O VALOR DA DEZENA COM 48 PARA DAR O VALOR CERTO NA TABELA ASCII
+0144   07A9           00557         ADDWF   CONT_AUX,F  
+0145   0829           00558         MOVFW   CONT_AUX    ;MOVO O VALOR PARA EQUIVALENTE EM ASCII PARA O WORK
+0146   00A3           00559         MOVWF   DADO        ;MOVO PARA A VARIAVEL DADO PARA TRATAR ESSE VALOR
+0147   2024           00560         CALL    TRATAR_DADOS    ;PARA COLOCAR NO LCD, CHAMO A FUNÇÃO PARA TRATAR ESSE DADO
+0148   0824           00561         MOVFW   DADO1       ;MOVO O VALOR DE DADO1 PARA A VARIVEL INICIA QUE
+0149   00A2           00562         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+014A   3005           00563         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+014B   00A6           00564         MOVWF   CONT
+014C   2044           00565         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+014D   30FE           00566         MOVLW   .254        ;DOU UM DELAY PARA PODER ESCREVER
+014E   203F           00567         CALL    DELAY
+                      00568         ;DEPOIS ENVIO A SEGUNDA PARTE DA LETRA PARA O LCD
+014F   0825           00569         MOVFW   DADO2       ;MOVO O VALOR DE DADO2 PARA A VARIVEL INICIA QUE
+0150   00A2           00570         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+0151   3005           00571         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+0152   00A6           00572         MOVWF   CONT
+0153   2044           00573         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+                      00574         
+                      00575         ;SOMO O VALOR DA UNIDADE COM 58, POIS EM UM CERTO MOMENTO EU SUBTRAI UMA VEZ A MAIS POR 10
+0154   303A           00576         MOVLW   .58         ; PARA DAR O VALOR CERTO NA TABELA ASCII    
+0155   07AD           00577         ADDWF   MEDIA2,F
+0156   082D           00578         MOVFW   MEDIA2      ;MOVO O VALOR PARA EQUIVALENTE EM ASCII PARA O WORK
+0157   00A3           00579         MOVWF   DADO        ;MOVO PARA A VARIAVEL DADO PARA TRATAR ESSE VALOR
+0158   2024           00580         CALL    TRATAR_DADOS    ;PARA COLOCAR NO LCD, CHAMO A FUNÇÃO PARA TRATAR ESSE DADO
+0159   0824           00581         MOVFW   DADO1       ;MOVO O VALOR DE DADO1 PARA A VARIVEL INICIA QUE
+015A   00A2           00582         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+015B   3005           00583         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+015C   00A6           00584         MOVWF   CONT
+015D   2044           00585         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+015E   30FE           00586         MOVLW   .254        ;DOU UM DELAY PARA PODER ESCREVER
+015F   203F           00587         CALL    DELAY
+                      00588         ;DEPOIS ENVIO A SEGUNDA PARTE DA LETRA PARA O LCD
+0160   0825           00589         MOVFW   DADO2       ;MOVO O VALOR DE DADO2 PARA A VARIVEL INICIA QUE
+0161   00A2           00590         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+0162   3005           00591         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+0163   00A6           00592         MOVWF   CONT
+0164   2044           00593         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+0165                  00594 PORCENTO        
+0165   3025           00595         MOVLW   .37         ;MOVO O VALOR % NA TABELA ASCII EM DADO
+0166   00A3           00596         MOVWF   DADO
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0167   2024           00597         CALL    TRATAR_DADOS    ;PARA COLOCAR NO LCD, CHAMO A FUNÇÃO PARA TRATAR ESSE DADO
+0168   0824           00598         MOVFW   DADO1       ;MOVO O VALOR DE DADO1 PARA A VARIVEL INICIA QUE
+0169   00A2           00599         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+016A   3005           00600         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+016B   00A6           00601         MOVWF   CONT
+016C   2044           00602         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+016D   30FE           00603         MOVLW   .254        ;DOU UM DELAY PARA PODER ESCREVER
+016E   203F           00604         CALL    DELAY
+                      00605         ;DEPOIS ENVIO A SEGUNDA PARTE DA LETRA PARA O LCD
+016F   0825           00606         MOVFW   DADO2       ;MOVO O VALOR DE DADO2 PARA A VARIVEL INICIA QUE
+0170   00A2           00607         MOVWF   INICIA      ;UTILIZO PARA PRINTAR NO LCD
+0171   3005           00608         MOVLW   .5          ;COLOCO 5 NO CONT PARA DESLOCAR O REGISTRADOR DE DESLOCAMENTO
+0172   00A6           00609         MOVWF   CONT
+0173   2044           00610         CALL    REG_DESLOC  ;CHAMO A FUNÇÃO PARA DESLOCAR OS BITS NO REGISTRADOR
+                      00611         
+0174   3014           00612         MOVLW   .20
+0175   00AB           00613         MOVWF   DELAY_TEMP
+0176                  00614 DELAY_200       
+0176   306A           00615         MOVLW   .106
+0177   203F           00616         CALL    DELAY
+0178   0BAB           00617         DECFSZ  DELAY_TEMP,F
+0179   2976           00618         GOTO    DELAY_200
+017A   28BC           00619         GOTO    CONVERSAO
+017B                  00620 FIM
+017B   297B           00621         GOTO FIM
+                      00622 
+                      00623 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00624 ;*                       FIM DO PROGRAMA                           *
+                      00625 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00626 
+                      00627         END
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADCON0                            0000001F
+ADCS0                             00000004
+ADCS1                             00000005
+ADCS2                             00000006
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+AGUARDA                           0000001F
+ANS0                              00000000
+ANS1                              00000001
+ANS2                              00000002
+ANS3                              00000003
+ANSEL                             0000009F
+AUX                               0000002A
+BANK0                             BCF STATUS,RP0
+BANK1                             BSF STATUS,RP0
+C                                 00000000
+CAL0                              00000002
+CAL1                              00000003
+CAL2                              00000004
+CAL3                              00000005
+CAL4                              00000006
+CAL5                              00000007
+CALC_MEDIA                        000000CF
+CHS0                              00000002
+CHS1                              00000003
+CINV                              00000004
+CIS                               00000003
+CLEAR_DADO                        0000002A
+CLEAR_DADO2                       00000036
+CLEAR_GP4                         00000047
+CLOCK_REG                         0000004A
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             00000019
+CMIE                              00000003
+CMIF                              00000003
+CONT                              00000026
+CONT2                             00000027
+CONT3                             00000028
+CONT_AUX                          00000029
+CONVERSAO                         000000BC
+COUT                              00000006
+DADO                              00000023
+DADO1                             00000024
+DADO2                             00000025
+DC                                00000001
+DECOMPONDO                        000000EB
+DELAY                             0000003F
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+DELAY_200                         00000176
+DELAY_TEMP                        0000002B
+DEPOIS_DO_INC                     000000D4
+DEPOIS_INC_SOMA                   000000E7
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDAT                             0000009A
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+F                                 00000001
+FIM                               0000017B
+FIM_DECOMPOSICAO                  000000F3
+FSR                               00000004
+GIE                               00000007
+GO                                00000001
+GO_DONE                           00000001
+GO_NOT_DONE                       00000001
+GP0                               00000000
+GP1                               00000001
+GP2                               00000002
+GP3                               00000003
+GP4                               00000004
+GP5                               00000005
+GPIE                              00000003
+GPIF                              00000000
+GPIO                              00000005
+GPIO0                             00000000
+GPIO1                             00000001
+GPIO2                             00000002
+GPIO3                             00000003
+GPIO4                             00000004
+GPIO5                             00000005
+GRAVA_EEPROM                      00000013
+INDF                              00000000
+INICIA                            00000022
+INICIO                            00000058
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IOC                               00000096
+IOC0                              00000000
+IOC1                              00000001
+IOC2                              00000002
+IOC3                              00000003
+IOC4                              00000004
+IOC5                              00000005
+IOCB                              00000096
+IOCB0                             00000000
+IOCB1                             00000001
+IOCB2                             00000002
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+IOCB3                             00000003
+IOCB4                             00000004
+IOCB5                             00000005
+IRP                               00000007
+LE_EEPROM                         0000000C
+LOOP1                             000000C0
+LOOP_1                            00000041
+LOOP_DIV                          00000026
+LOOP_DIV2                         00000032
+MAIN                              00000066
+MEDIA                             000000D9
+MEDIA1                            0000002C
+MEDIA2                            0000002D
+MEDIA_AUX                         0000002E
+NAO_100                           00000143
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000001
+NOT_GPPU                          00000007
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+OPTION_REG                        00000081
+OSCCAL                            00000090
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIR1                              0000000C
+PORCENTO                          00000165
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RD                                00000000
+REG_DESLOC                        00000044
+RP0                               00000005
+RP1                               00000006
+SAIR                              0000002D
+SAIR2                             00000039
+SAI_INT                           00000007
+SET_DADO                          0000002C
+SET_DADO2                         00000038
+SET_GP4                           00000049
+SOMA                              000000E2
+STATUS                            00000003
+STATUS_TEMP                       00000021
+SUBROTINA1                        00000024
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1IE                              00000000
+T1IF                              00000000
+T1OSCEN                           00000003
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1GE                            00000006
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TRATAR_DADOS                      00000024
+TRISIO                            00000085
+TRISIO0                           00000000
+TRISIO1                           00000001
+TRISIO2                           00000002
+TRISIO3                           00000003
+TRISIO4                           00000004
+TRISIO5                           00000005
+VCFG                              00000006
+VOLTA                             000000C1
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+VR3                               00000003
+VRCON                             00000099
+VREN                              00000007
+VRR                               00000005
+W                                 00000000
+WPU                               00000095
+WPU0                              00000000
+WPU1                              00000001
+WPU2                              00000002
+WPU4                              00000004
+WPU5                              00000005
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+W_TEMP                            00000020
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_CPD_ON                           00003EFF
+_CP_OFF                           00003FFF
+_CP_ON                            00003F7F
+_DEVID1                           00002006
+_EC_OSC                           00003FFB
+_EXTRC_OSC_CLKOUT                 00003FFF
+_EXTRC_OSC_NOCLKOUT               00003FFE
+_FOSC_EC                          00003FFB
+_FOSC_EXTRCCLK                    00003FFF
+_FOSC_EXTRCIO                     00003FFE
+_FOSC_HS                          00003FFA
+_FOSC_INTRCCLK                    00003FFD
+_FOSC_INTRCIO                     00003FFC
+_FOSC_LP                          00003FF8
+_FOSC_XT                          00003FF9
+_HS_OSC                           00003FFA
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FF8
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FEF
+_WDTE_OFF                         00003FF7
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FF7
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FF9
+__12F675                          00000001
+__DEBUG                           
+__MPLAB_DEBUGGER_SIMULATOR        1
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+00C0 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0100 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0140 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXX----
+2000 : -------X-------- ---------------- ---------------- ----------------
+MPASM 5.77  /HOME/ALEXANDRE/MPLABXPROJECTS/A   9-20-2018  14:15:16         PAGE 19
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+
+2100 : XXXXXXXXX------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:   377
+Program Memory Words Free:   647
+
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :    26 reported,     0 suppressed
+
+
